@@ -13,7 +13,7 @@
 
 ## 安装（普通用户）
 
-从 [Releases](../../releases) 下载 `随声-<版本>.dmg`，打开后把「随声」拖进「应用程序」。
+从 [Releases](https://github.com/yaw0110/suisheng/releases) 下载 `Suisheng-<版本>.dmg`，打开后把「随声」拖进「应用程序」。
 
 1. 首次打开若提示“无法验证开发者”：到「系统设置 → 隐私与安全性」点“仍要打开”（本 App 为免费签名，只需一次）。
 2. 首次打开会自动安装运行环境和「实时识别」模型（共约 370MB，默认走国内镜像，需几分钟）。
@@ -49,7 +49,7 @@
 ## 从源码运行 / 开发
 
 ```bash
-git clone --recursive <本仓库地址> suisheng && cd suisheng
+git clone --recursive https://github.com/yaw0110/suisheng.git && cd suisheng
 python3 -m venv .venv
 .venv/bin/pip install --no-deps -r requirements.txt   # 必须 --no-deps：否则会顺带装上 torch 等 1GB+ 用不到的包
 .venv/bin/pip install --no-deps -e .
