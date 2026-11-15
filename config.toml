@@ -1,8 +1,0 @@
-# 随声 · 自定义配置：只写要修改的项，其余沿用默认值。改完重新开启字幕生效。
-# 全部可调项及说明见程序内置的 default_config.toml，例如：
-# [display]
-# font = 32            # 字号
-# bottom_margin = 120  # 离屏幕底部的距离
-#
-# [segment.speech]
-# pause_none = 0.7     # 停顿多久断句（秒），越小出字越快但越容易切碎

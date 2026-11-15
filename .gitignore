@@ -15,3 +15,6 @@ dist/
 *.app/
 app/icon/preview_*.png
 models-xp/
+# 开发时程序在项目根目录生成的个人设置
+/config.toml
+/settings.json
