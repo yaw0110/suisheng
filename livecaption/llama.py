@@ -35,8 +35,9 @@ def bundled_dir():
 
 
 def _install_mac_copy(src, home):
-    """macOS：从网上下载的 App 带“隔离”标记，App 里单独启动的可执行文件会被系统拦下。
-    所以首次运行时把 llama.cpp 复制到用户数据目录——只复制内容（不带隔离等扩展属性），之后从那里启动。"""
+    """macOS：首次运行时把 App 内置的 llama.cpp 复制到用户数据目录，之后从那里启动。
+    实测（macOS 15）：用户对 App 点过“仍要打开”后，由它写出的文件虽仍带来源标记，但已随 App 一并放行，可正常运行；
+    同时用户数据目录可写，避免依赖 App 包内路径（App 被系统临时搬到只读位置运行时也不受影响）。"""
     version = (src / "VERSION").read_text().strip() if (src / "VERSION").exists() else "llama"
     dst = Path(home) / "bin" / version
     if (dst / EXE).is_file() and (dst / ".ok").exists():
