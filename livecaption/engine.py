@@ -3,7 +3,7 @@
 import threading
 
 from . import config
-from .audio import file_source, stdin_source, system_source
+from .audio import file_source, stdin_source
 from .bus import Bus
 from .captioner import Captioner
 from .refiner import Refiner
@@ -28,8 +28,6 @@ class Engine:
             return file_source(a.file, self.stop_event, realtime=not a.fast)
         if a.audio_stdin:
             return stdin_source(self.stop_event)
-        if getattr(a, "audiotee", None):                         # 旧的命令行抓音方式（开发用）
-            return system_source(self.cfg.paths.audiotee, self.stop_event)
         return system_audio(self.stop_event)
 
     def start(self):

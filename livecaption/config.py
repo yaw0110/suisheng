@@ -45,7 +45,6 @@ def parse_args(argv=None):
     ap.add_argument("--max-sent", type=float, help="单句最长秒数")
     ap.add_argument("--refresh", type=float, help="SenseVoice 滚动重识别的最小间隔(秒)")
     ap.add_argument("--home", help="用户数据目录（模型/热词/配置/记录），默认见模块说明")
-    ap.add_argument("--audiotee", help="audiotee 可执行文件路径（命令行运行时用）")
     ap.add_argument("--audio-stdin", action="store_true",
                     help="从标准输入读 16k/16bit/单声道 PCM（菜单栏 App 自己抓声音后通过管道传入）")
     ap.add_argument("--hotwords", help="热词表路径（默认 <home>/hotwords.txt）")
@@ -92,7 +91,6 @@ def load(argv=None):
             sensevoice=mdir / m["sensevoice"],
             qwen_asr=mdir / m["qwen_asr"],
             translator=mdir / m["translator"],
-            audiotee=Path(args.audiotee) if args.audiotee else home / m["audiotee"],
             hotwords=hot if hot.exists() else DEFAULT_HOTWORDS,
             logs=home / "logs",
             runtime=home / "runtime",

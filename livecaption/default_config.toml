@@ -9,7 +9,6 @@ dir = "models"
 sensevoice = "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17"   # 实时识别（快）
 qwen_asr = "Qwen3-ASR-1.7B-GGUF"                                      # 定稿精修（准），llama.cpp 运行
 translator = "Hy-MT2-1.8B-GGUF"                                       # 翻译，llama.cpp 运行（高配可换 Hy-MT2-7B-GGUF）
-audiotee = "vendor/audiotee/.build/release/audiotee"                  # 抓系统声音
 
 [llama]
 server = ""            # llama-server 路径；留空则依次找 <数据目录>/bin、PATH、Homebrew
