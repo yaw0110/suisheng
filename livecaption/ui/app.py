@@ -26,7 +26,7 @@ from .panel import Panel
 from .platform import set_overlay_mode
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
-DEFAULTS = {"mode": "speech", "lang": "auto", "script": "s", "refine": True, "translate": False}
+DEFAULTS = {"mode": "speech", "lang": "auto", "script": "s", "refine": True, "translate": False, "overlay_pos": None}
 CONFIG_TEMPLATE = """# 随声 · 自定义配置：只写要修改的项，其余沿用默认值。改完重新开启字幕生效。
 # 全部可调项及说明见程序内置的 default_config.toml，例如：
 # [display]
@@ -68,6 +68,8 @@ class App(QObject):
         self.top_id = -1
         self.last_tray = 0.0
         self.overlay = Overlay(cfg.display)
+        self.overlay.closed.connect(lambda: self.stop() if self.state == "on" else None)
+        self.overlay.moved.connect(self._on_overlay_moved)
         self.models_win = ModelsWindow(cfg)
         self.models_win.changed.connect(self._refresh_icon)
         self.started.connect(self._on_started)
@@ -122,6 +124,9 @@ class App(QObject):
                 self.menu.popup(QCursor.pos())
         elif reason == R.Trigger:
             self.toggle()
+
+    def _on_overlay_moved(self, x, y):
+        self.settings.set("overlay_pos", None if x < 0 else [x, y])
 
     def _on_action(self, name):
         if name == "models":
@@ -214,6 +219,7 @@ class App(QObject):
         cfg = make_config(home=str(self.home), mode=s["mode"], lang=s["lang"], script=s["script"],
                           no_qwen=not s["refine"], translate=bool(s["translate"]))
         self.state = "starting"; self._refresh_icon()
+        self.overlay.saved_pos = tuple(s["overlay_pos"]) if s["overlay_pos"] else None
         self.overlay.set_translation_visible(bool(s["translate"]))
         self.overlay.clear(); self.overlay.set_text("bot", "字幕启动中…"); self.overlay.show()
 

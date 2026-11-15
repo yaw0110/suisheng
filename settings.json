@@ -3,5 +3,9 @@
  "lang": "auto",
  "script": "s",
  "refine": true,
- "translate": true
+ "translate": true,
+ "overlay_pos": [
+  192,
+  758
+ ]
 }

@@ -18,8 +18,8 @@ def set_overlay_mode(on):
 
 
 def float_above_everything(widget):
-    """macOS：悬浮窗出现在所有桌面、能盖住全屏视频、不抢焦点、鼠标穿透（Qt 没有这些接口）。
-    Windows：Qt 的置顶 + 穿透标志已足够。"""
+    """macOS：悬浮窗出现在所有桌面、能盖住全屏视频、不抢焦点（Qt 没有这些接口）。
+    Windows：Qt 的置顶 + 不抢焦点标志已足够。"""
     if not MAC:
         return
     try:
@@ -31,7 +31,8 @@ def float_above_everything(widget):
         # canJoinAllSpaces(1<<0) | stationary(1<<4) | fullScreenAuxiliary(1<<8)
         win.setCollectionBehavior_((1 << 0) | (1 << 4) | (1 << 8))
         win.setHidesOnDeactivate_(False)
-        win.setIgnoresMouseEvents_(True)
+        win.setIgnoresMouseEvents_(False)
+        win.setAcceptsMouseMovedEvents_(True)
         win.orderFrontRegardless()
     except Exception as e:                            # noqa: BLE001
         print("悬浮窗置顶设置失败：", e, file=sys.stderr)
