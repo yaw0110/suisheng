@@ -10,8 +10,11 @@ let S: CGFloat = 1024
 func rgb(_ h: UInt32, _ a: CGFloat = 1) -> CGColor {
     CGColor(red: CGFloat((h >> 16) & 0xff) / 255, green: CGFloat((h >> 8) & 0xff) / 255, blue: CGFloat(h & 0xff) / 255, alpha: a)
 }
+let tpl = style == "template"
 let P: (bg0: CGColor, bg1: CGColor, glow: CGColor, q0: CGColor, q1: CGColor, shaft: CGColor, ink0: CGColor, ink1: CGColor) =
-    style == "paper"
+    tpl
+    ? (rgb(0,0), rgb(0,0), rgb(0,0), rgb(0x000000), rgb(0x000000), rgb(0x000000, 0), rgb(0x000000), rgb(0x000000))
+    : style == "paper"
     ? (rgb(0xFBF8F1), rgb(0xECE4D3), rgb(0xFFFFFF, 0.5), rgb(0x2B3A8C), rgb(0x5163DA), rgb(0xFBF8F1, 0.85), rgb(0x3A47B8), rgb(0x22B3A6))
     : (rgb(0x1F2B4D), rgb(0x0B1020), rgb(0x5B7CFF, 0.22), rgb(0xFFFFFF), rgb(0xC9D4F2), rgb(0x1A2442, 0.75), rgb(0xFFD36B), rgb(0xFF8A4C))
 
@@ -22,15 +25,19 @@ let ctx = CGContext(data: nil, width: Int(S), height: Int(S), bitsPerComponent: 
 // ---- 底：圆角方块（Apple 图标网格 824/1024）+ 阴影 + 渐变 + 柔光 ----
 let body = CGRect(x: 100, y: 100, width: 824, height: 824), R: CGFloat = 185
 let bodyPath = CGPath(roundedRect: body, cornerWidth: R, cornerHeight: R, transform: nil)
+if !tpl {
 ctx.saveGState()
 ctx.setShadow(offset: CGSize(width: 0, height: -10), blur: 26, color: rgb(0x000000, 0.30))
 ctx.addPath(bodyPath); ctx.setFillColor(P.bg1); ctx.fillPath()
 ctx.restoreGState()
+}
 ctx.saveGState(); ctx.addPath(bodyPath); ctx.clip()
+if !tpl {
 ctx.drawLinearGradient(CGGradient(colorsSpace: cs, colors: [P.bg0, P.bg1] as CFArray, locations: [0, 1])!,
                        start: CGPoint(x: 0, y: body.maxY), end: CGPoint(x: 0, y: body.minY), options: [])
 ctx.drawRadialGradient(CGGradient(colorsSpace: cs, colors: [P.glow, P.glow.copy(alpha: 0)!] as CFArray, locations: [0, 1])!,
                        startCenter: CGPoint(x: 600, y: 640), startRadius: 0, endCenter: CGPoint(x: 600, y: 640), endRadius: 420, options: [])
+}
 ctx.restoreGState()
 
 // ---- 墨迹：从笔尖流出的波浪，由粗到细 ----
@@ -69,7 +76,7 @@ let L: CGFloat = 610
 ctx.saveGState()
 ctx.translateBy(x: nib.x, y: nib.y)
 ctx.rotate(by: -38 * .pi / 180)
-ctx.setShadow(offset: CGSize(width: 6, height: -10), blur: 22, color: rgb(0x000000, style == "paper" ? 0.18 : 0.45))
+if !tpl { ctx.setShadow(offset: CGSize(width: 6, height: -10), blur: 22, color: rgb(0x000000, style == "paper" ? 0.18 : 0.45)) }
 ctx.beginTransparencyLayer(auxiliaryInfo: nil)
 // 羽片：左宽右窄、略带弧度
 let vane = CGMutablePath()

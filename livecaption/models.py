@@ -50,8 +50,11 @@ def status(home):
             for k, v in CATALOG.items()}
 
 
-def _emit(**kw):
+def _print(**kw):
     print(json.dumps(kw, ensure_ascii=False), flush=True)
+
+
+_emit = _print
 
 
 def _log(home, msg):
@@ -86,7 +89,10 @@ def _sha256(path):
     return h.hexdigest()
 
 
-def download(home, key):
+def download(home, key, emit=None, cancel=None):
+    """emit(**事件)：进度回调（默认打印 JSON 行）；cancel：threading.Event，置位即中止"""
+    global _emit
+    _emit = emit or _print
     d = model_dir(home, key)
     d.mkdir(parents=True, exist_ok=True)
     files = _files(key)
@@ -116,6 +122,10 @@ def download(home, key):
                 p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
                 while p.poll() is None:
                     time.sleep(0.5)
+                    if cancel is not None and cancel.is_set():
+                        p.terminate(); p.wait()
+                        _emit(event="error", error="已取消（再点下载会接着下）")
+                        return 1
                     _emit(event="progress", done=done_bytes(), total=total)
                 err = (p.stderr.read() or "").strip()
                 if p.returncode == 33 or (part.exists() and part.stat().st_size > size):

@@ -5,6 +5,8 @@ home（用户数据目录：模型、热词、配置、字幕记录）：
   - App 安装版：~/Library/Application Support/LiveCaption（由 App 用 --home 传入）
 """
 import argparse
+import os
+import sys
 import tomllib
 from pathlib import Path
 from types import SimpleNamespace
@@ -13,12 +15,20 @@ PKG = Path(__file__).resolve().parent
 SR = 16000  # 全流程统一 16kHz 单声道
 DEFAULT_CONFIG = PKG / "default_config.toml"
 DEFAULT_HOTWORDS = PKG / "default_hotwords.txt"
-APP_HOME = Path.home() / "Library/Application Support/LiveCaption"
+if sys.platform == "darwin":
+    APP_HOME = Path.home() / "Library/Application Support/LiveCaption"
+elif sys.platform == "win32":
+    APP_HOME = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local")) / "LiveCaption"
+else:
+    APP_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "livecaption"
 
 
 def default_home():
+    """从源码目录运行用项目根目录；安装版（PyInstaller 打包）用用户数据目录"""
     src_root = PKG.parent
-    return src_root if (src_root / "pyproject.toml").exists() else APP_HOME
+    if not getattr(sys, "frozen", False) and (src_root / "pyproject.toml").exists():
+        return src_root
+    return APP_HOME
 
 
 def parse_args(argv=None):
