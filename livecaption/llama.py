@@ -23,11 +23,49 @@ EXE = "llama-server.exe" if os.name == "nt" else "llama-server"
 _NO_PROXY = urllib.request.build_opener(urllib.request.ProxyHandler({}))   # 本机请求不走系统代理
 
 
+def bundled_dir():
+    """安装包自带的 llama.cpp（打包时放在 App 里的 llama/ 目录）"""
+    if not getattr(sys, "frozen", False):
+        return None
+    base = Path(sys.executable).resolve().parent                   # macOS: Contents/MacOS；Windows: 程序目录
+    for d in (base / "llama", base.parent / "Resources" / "llama", base / "_internal" / "llama"):
+        if (d / EXE).is_file():
+            return d
+    return None
+
+
+def _install_mac_copy(src, home):
+    """macOS：从网上下载的 App 带“隔离”标记，App 里单独启动的可执行文件会被系统拦下。
+    所以首次运行时把 llama.cpp 复制到用户数据目录——只复制内容（不带隔离等扩展属性），之后从那里启动。"""
+    version = (src / "VERSION").read_text().strip() if (src / "VERSION").exists() else "llama"
+    dst = Path(home) / "bin" / version
+    if (dst / EXE).is_file() and (dst / ".ok").exists():
+        return dst
+    tmp = dst.with_name(dst.name + ".tmp")
+    shutil.rmtree(tmp, ignore_errors=True); tmp.mkdir(parents=True)
+    for f in src.iterdir():
+        if f.is_file():
+            shutil.copyfile(f, tmp / f.name)                       # copyfile：不复制扩展属性
+            os.chmod(tmp / f.name, 0o755 if (f.name == EXE or f.suffix == ".dylib") else 0o644)
+    (tmp / ".ok").write_text(version)
+    shutil.rmtree(dst, ignore_errors=True); tmp.rename(dst)
+    return dst
+
+
 def find_server(cfg):
-    """llama-server 的位置：配置指定 → 用户数据目录 bin/ → 系统 PATH"""
-    cands = [getattr(cfg.llama, "server", "") or None, cfg.home / "bin" / EXE, shutil.which("llama-server"),
-             "/opt/homebrew/bin/llama-server", "/usr/local/bin/llama-server"]
-    for c in cands:
+    """llama-server 的位置：配置指定 → 安装包自带 → 系统里装的（开发用）"""
+    custom = getattr(cfg.llama, "server", "") or None
+    if custom and Path(custom).is_file():
+        return str(custom)
+    b = bundled_dir()
+    if b is not None:
+        if sys.platform == "darwin":
+            try:
+                b = _install_mac_copy(b, cfg.home)
+            except OSError as e:
+                log_err(f"复制 llama.cpp 失败：{e}")
+        return str(b / EXE)
+    for c in (shutil.which("llama-server"), "/opt/homebrew/bin/llama-server", "/usr/local/bin/llama-server"):
         if c and Path(c).is_file():
             return str(c)
     return None

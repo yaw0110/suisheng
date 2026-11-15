@@ -18,3 +18,6 @@ models-xp/
 # 开发时程序在项目根目录生成的个人设置
 /config.toml
 /settings.json
+/bin/
+/build/
+/.venv-build/

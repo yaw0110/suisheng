@@ -24,7 +24,9 @@ else:
 
 
 def default_home():
-    """从源码目录运行用项目根目录；安装版（PyInstaller 打包）用用户数据目录"""
+    """从源码目录运行用项目根目录；安装版（PyInstaller 打包）用用户数据目录；环境变量 LIVECAPTION_HOME 可覆盖"""
+    if os.environ.get("LIVECAPTION_HOME"):
+        return Path(os.environ["LIVECAPTION_HOME"]).expanduser()
     src_root = PKG.parent
     if not getattr(sys, "frozen", False) and (src_root / "pyproject.toml").exists():
         return src_root

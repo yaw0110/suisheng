@@ -1,41 +1,20 @@
-Jinja2==3.1.6
-MarkupSafe==3.0.4
-OpenCC==1.4.2
-PyYAML==6.0.3
-ToJyutping==3.2.0
-anyio==4.16.0
-filelock==4.2.10
-h11==0.16.0
-httpcore2==2.16.0
-httpx2==2.16.0
-huggingface_hub==2.4.0
-idna==3.20
-mlx==0.32.4
-mlx-audio==0.6.5
-mlx-lm==0.32.2
-mlx-metal==0.32.4
+# 运行依赖（实测用到的最小集合）。安装：pip install -r requirements.txt
 numpy==2.5.4
-packaging==26.3
-pyobjc-core==13.0
-pyobjc-framework-Cocoa==13.0
-pypinyin==0.55.0
-regex==2026.11.9
-sentencepiece==0.2.3
-sherpa-onnx-core==2.0.1
-sherpa_onnx==2.0.1
 soundfile==0.14.0
-tokenizers==0.23.3
-tqdm==4.70.1
-transformers==5.23.0
-truststore==0.10.5
-typing_extensions==4.16.0
 cffi==2.1.1
 pycparser==3.12
-safetensors==0.8.0
-certifi==2026.10.23
-hf-xet==1.8.0
-protobuf==7.36.2
-catap==0.6.1; sys_platform == "darwin"
-PyAudioWPatch==0.2.12.9; sys_platform == "win32"
-PySide6-Essentials==6.12.0
+sherpa_onnx==2.0.1
+sherpa-onnx-core==2.0.1
+OpenCC==1.4.2
+pypinyin==0.55.0
+ToJyutping==3.2.0
+PySide6_Essentials==6.12.0
 shiboken6==6.12.0
+typing_extensions==4.16.0
+# macOS：抓系统声音（Core Audio Tap）与窗口细节
+catap==0.6.1; sys_platform == "darwin"
+pyobjc-core==13.0; sys_platform == "darwin"
+pyobjc-framework-Cocoa==13.0; sys_platform == "darwin"
+pyobjc-framework-CoreAudio==13.0; sys_platform == "darwin"
+# Windows：抓系统声音（WASAPI 回环）
+PyAudioWPatch==0.2.12.9; sys_platform == "win32"
