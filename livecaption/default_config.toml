@@ -1,0 +1,48 @@
+# 实时字幕默认配置（随程序分发，请勿修改）。
+# 要调整：在用户目录的 config.toml 里只写要改的项即可，例如：
+#   [display]
+#   font = 32
+# 改完重新开启字幕生效。命令行参数（--pause 等）会覆盖这里的值。
+
+[models]
+dir = "models"
+sensevoice = "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17"   # 实时识别（快）
+qwen_asr = "Qwen3-ASR-1.7B-8bit"                                      # 定稿精修（准）
+translator = "Hy-MT2-7B-4bit"                                         # 翻译
+audiotee = "vendor/audiotee/.build/release/audiotee"                  # 抓系统声音
+
+[asr]
+threads = 4
+refresh = 0.3          # SenseVoice 滚动重识别的最小间隔(秒)；机器忙时会自动放慢
+
+[segment]              # 断句
+min_tokens = 4         # 少于这么多字/词的碎片不单独成句（除非停顿很长）
+max_sentence = 10      # 一句最长秒数，超过就强制在句号/逗号/最大停顿处切
+long_pause = 1.6       # 超过这个停顿，再短的碎片也单独成句
+
+[segment.speech]       # 说话模式：标点后停顿多久(秒)就断句
+pause_end = 0.3        # 句末标点（。？！）后
+pause_comma = 0.55     # 逗号后
+pause_none = 0.9       # 无标点
+
+[segment.song]         # 歌曲模式：字被拉长，阈值更大
+pause_end = 0.5
+pause_comma = 0.7
+pause_none = 1.0
+
+[filter]
+silence_rms = 0.002        # 低于此音量视为静音
+token_rel_energy = 0.12    # 某个字位置的音量低于整段的这个比例，视为幻听
+min_audio_rms = 0.003      # 定稿句音频低于此音量，不送去精修
+
+[refine]
+max_backlog = 3        # 精修积压超过这么多句，就跳过旧句（保证延迟不越积越多）
+
+[translate]
+context = 2            # 翻译时带上前几句作参考
+
+[display]
+font = 26
+width = 1100           # 字幕窗最大宽度（像素）
+bottom_margin = 60     # 离屏幕底部的距离
+opacity = 0.55         # 背景不透明度

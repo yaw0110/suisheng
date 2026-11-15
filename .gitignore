@@ -1,0 +1,16 @@
+# 大文件 / 本机生成物，不进版本库
+models/
+.venv/
+data/
+logs/
+runtime/
+__pycache__/
+*.egg-info/
+app/build/
+*.wav
+*.pcm
+*.log
+.ready
+dist/
+*.app/
+app/icon/preview_*.png
