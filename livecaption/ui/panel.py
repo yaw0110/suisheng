@@ -1,4 +1,6 @@
 """主控制面板：开始 / 停止 + 常用设置。托盘图标可能被挤掉（Mac 刘海 / Windows 托盘折叠区），面板是稳定的入口。"""
+import sys
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
@@ -60,7 +62,8 @@ class Panel(QWidget):
         quit_btn = QPushButton("退出随声"); quit_btn.clicked.connect(lambda: self.action.emit("quit"))
         foot.addWidget(ver); foot.addStretch(1); foot.addWidget(quit_btn)
         lay.addLayout(foot)
-        tip = QLabel("关掉这个窗口字幕照常运行；点程序坞 / 任务栏图标或菜单栏羽毛笔可再打开。")
+        tip = QLabel("关掉这个窗口字幕照常运行。要再打开它：再次打开「随声」，或点菜单栏 / 托盘的羽毛笔"
+                     + ("；字幕运行时程序坞图标会暂时隐藏（这样字幕才能盖住全屏视频）。" if sys.platform == "darwin" else "。"))
         tip.setWordWrap(True); tip.setStyleSheet("color: gray; font-size: 11px;")
         lay.addWidget(tip)
 

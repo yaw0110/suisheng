@@ -1,0 +1,7 @@
+{
+ "mode": "speech",
+ "lang": "auto",
+ "script": "s",
+ "refine": true,
+ "translate": true
+}

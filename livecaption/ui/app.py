@@ -23,6 +23,7 @@ from ..runtime import Runtime
 from .models_window import ModelsWindow
 from .overlay import Overlay
 from .panel import Panel
+from .platform import set_overlay_mode
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 DEFAULTS = {"mode": "speech", "lang": "auto", "script": "s", "refine": True, "translate": False}
@@ -225,11 +226,13 @@ class App(QObject):
 
     def _on_started(self, result):
         if isinstance(result, Exception):
-            self.state = "off"; self.overlay.hide(); self._refresh_icon()
+            self.state = "off"; self.overlay.hide(); self._refresh_icon(); set_overlay_mode(False)
             QMessageBox.warning(None, "随声", f"字幕启动失败：{result}\n\n如果是 macOS，请到「系统设置 → 隐私与安全性 → "
                                               "屏幕与系统录音」允许本程序录制系统声音。")
             return
         self.engine, self.state, self.top_id = result, "on", -1
+        set_overlay_mode(True)                                   # macOS：小工具模式，悬浮字幕才能盖住全屏视频
+        self.overlay.show()
         self.overlay.set_text("bot", "字幕已启动，等待声音…")
         self._refresh_icon()
 
@@ -245,6 +248,8 @@ class App(QObject):
 
     def _stopped(self, then_start):
         self.state = "off"; self.overlay.hide(); self._refresh_icon()
+        if not then_start:
+            set_overlay_mode(False)                              # 恢复程序坞图标
         if then_start:
             self.start()
 
