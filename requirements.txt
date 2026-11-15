@@ -35,3 +35,5 @@ safetensors==0.8.0
 certifi==2026.10.23
 hf-xet==1.8.0
 protobuf==7.36.2
+catap==0.6.1; sys_platform == "darwin"
+PyAudioWPatch==0.2.12.9; sys_platform == "win32"

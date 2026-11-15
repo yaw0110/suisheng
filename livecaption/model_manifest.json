@@ -38,164 +38,50 @@
  "qwen_asr": {
   "files": [
    [
-    "README.md",
-    1008,
-    "b356d4bdfbe7287b06b9b5ad084d9557a24ca98ca277a839beb2e682037b08f6"
+    "Qwen3-ASR-1.7B-Q8_0.gguf",
+    2165034944,
+    "58e22d0532d4eacaf034cfac17a6fed159f37c41390c710186783be439d1fc57"
    ],
    [
-    "chat_template.json",
-    1161,
-    "75a8cfca24f00de72d796fbfed6858fc9614ef3dabd8696684cc3bc03a9c58ff"
-   ],
-   [
-    "config.json",
-    7188,
-    "1b76b3b6c655fc54595da025f7a96474ad9fa86363303fbdd61a7d8483ccfaf7"
-   ],
-   [
-    "generation_config.json",
-    142,
-    "1da527824d81e07118facff437e03f2e24a23311e3bdeb2368973fe77e5f275c"
-   ],
-   [
-    "merges.txt",
-    1671853,
-    "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
-   ],
-   [
-    "model.safetensors",
-    2463307541,
-    "bf304b009cc7eca79283056f787b44c952d24ac22cec787b39732bba3c23c13c"
-   ],
-   [
-    "model.safetensors.index.json",
-    78968,
-    "0a5d0ec11188602242ff81a9969883d0fdeb98cd5d85cd1413089d897c201af5"
-   ],
-   [
-    "preprocessor_config.json",
-    330,
-    "45e120a4eda2c20c5d7f2ea9354e63536bf35e27aa573fb7cdf78017b378770d"
-   ],
-   [
-    "tokenizer_config.json",
-    12487,
-    "4942d005604266809309cabc9f4e9cb89ce855d59b14681fdc0e1cc62ea26c4c"
-   ],
-   [
-    "vocab.json",
-    2776833,
-    "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+    355709344,
+    "46c1d533af3f354ceb37ce855dbceff7da7fa7cf1e6a523df3b13440bd164c0d"
    ]
   ],
   "sources": [
    {
     "type": "modelscope",
-    "repo": "mlx-community/Qwen3-ASR-1.7B-8bit"
-   },
-   {
-    "type": "hf",
-    "endpoint": "https://hf-mirror.com",
-    "repo": "mlx-community/Qwen3-ASR-1.7B-8bit",
-    "revision": "a8379a2e2f9e313c9292cdf1af4055ab56d50d55"
-   },
-   {
-    "type": "hf",
-    "endpoint": "https://huggingface.co",
-    "repo": "mlx-community/Qwen3-ASR-1.7B-8bit",
-    "revision": "a8379a2e2f9e313c9292cdf1af4055ab56d50d55"
+    "repo": "ggml-org/Qwen3-ASR-1.7B-GGUF"
    }
   ]
  },
  "translator": {
   "files": [
    [
-    "LICENSE.txt",
-    11625,
-    "fccbe004b9870859aa97ba932e647cb1ac39f54716ef008ddf666d86a34ffd98"
-   ],
-   [
-    "README.md",
-    3557,
-    "48f716c4e8fbcc46a6021f609ec795cb2540487308c9af852193ee31e80bafe8"
-   ],
-   [
-    "README_CN.md",
-    14474,
-    "a9c12e104fd2095652a8f7e842431aee8f453a83e44583cf3d3c54f90cf65aa6"
-   ],
-   [
-    "chat_template.jinja",
-    662,
-    "788ac16c5d7bfefc28655928ad524c8f378a44cb24d24fb125d6a5859b167677"
-   ],
-   [
-    "config.json",
-    1721,
-    "03ce74a3e7160193621b85ac637537278de6214f2677513c35f3eb343056883a"
-   ],
-   [
-    "generation_config.json",
-    217,
-    "56cd0974cae79f49ecaec4a02936bcabed2a4c8d8b6a780bf4a94ccbf344a78b"
-   ],
-   [
-    "imgs/logo-en.png",
-    65860,
-    "0cd56e2438d4c91a5d529b3102f800de5f17c768f73caaf4848a864e7b741080"
-   ],
-   [
-    "imgs/logo-zh.png",
-    69906,
-    "1e9a9aea04658439e1af23db01c4cd2c6c6765fd1efd1a594c7ffdd312f31bb6"
-   ],
-   [
-    "imgs/main_result.png",
-    3840604,
-    "b87606817fec4fbdaca939de433e4d2a8e92d65493f44222aaaefb381f5a8c6e"
-   ],
-   [
-    "mlx_manifest.json",
-    322,
-    "6c7c406dcc629e2382cb0afcb5ef33100adff10cd09374101fd2c3ca1bcee4a4"
-   ],
-   [
-    "model.safetensors",
-    4221806239,
-    "3f4ae381527394ed768ca8eed3cf69940d9d54415bf555c26072d6c0d5f94a42"
-   ],
-   [
-    "model.safetensors.index.json",
-    57380,
-    "20976f5c66c1dd333a2877f7d253b0ceb5188bad283b001cd6248f3e054bb82d"
-   ],
-   [
-    "tokenizer.json",
-    16388221,
-    "4185389a69284fdd3ebf737c6120bbeee36cbed9763151fa5bac5986a39e05d4"
-   ],
-   [
-    "tokenizer_config.json",
-    277,
-    "c22cbe91c8a483be0947552bc45505f4f5d32b1d5ad6bdaa38e49f5aac6d8e7a"
+    "Hy-MT2-1.8B-Q4_K_M.gguf",
+    1133080448,
+    "dc5f44fcf1fa496ee7ad725982c0c8c553a4de00259b53af84c4b89fb0c06699"
    ]
   ],
   "sources": [
    {
     "type": "modelscope",
-    "repo": "mlx-community/Hy-MT2-7B-4bit"
-   },
+    "repo": "Tencent-Hunyuan/Hy-MT2-1.8B-GGUF"
+   }
+  ]
+ },
+ "translator_7b": {
+  "files": [
+   [
+    "Hy-MT2-7B-Q4_K_M.gguf",
+    4624648896,
+    "9f96256500f3fc1ab4d64336b58f52a949a95ad7516b0c229476eef782f9f77b"
+   ]
+  ],
+  "sources": [
    {
-    "type": "hf",
-    "endpoint": "https://hf-mirror.com",
-    "repo": "mlx-community/Hy-MT2-7B-4bit",
-    "revision": "9b7204bdb161490a8ce49ce607c1310cc3fd03ad"
-   },
-   {
-    "type": "hf",
-    "endpoint": "https://huggingface.co",
-    "repo": "mlx-community/Hy-MT2-7B-4bit",
-    "revision": "9b7204bdb161490a8ce49ce607c1310cc3fd03ad"
+    "type": "modelscope",
+    "repo": "Tencent-Hunyuan/Hy-MT2-7B-GGUF"
    }
   ]
  }

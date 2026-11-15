@@ -96,6 +96,7 @@ def load(argv=None):
             long_pause=seg["long_pause"],
         ),
         filt=SimpleNamespace(**raw["filter"]),
+        llama=SimpleNamespace(**raw.get("llama", {"server": "", "gpu_layers": 99, "threads": 0})),
         refine=SimpleNamespace(**raw["refine"]),
         translate=SimpleNamespace(**raw["translate"]),
         display=SimpleNamespace(**{**raw["display"], **({"font": args.font} if args.font else {})}),

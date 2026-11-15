@@ -23,8 +23,8 @@ MANIFEST = json.loads((Path(__file__).parent / "model_manifest.json").read_text(
 # key 与 config.toml [models] 里的目录名对应
 CATALOG = {
     "sensevoice": {"title": "实时识别（SenseVoice，必需）", "size_mb": 240},
-    "qwen_asr": {"title": "Qwen 精修（粤语更准，可选）", "size_mb": 2470},
-    "translator": {"title": "翻译（粤语/英文→普通话，可选）", "size_mb": 4240},
+    "qwen_asr": {"title": "Qwen 精修（粤语更准，可选）", "size_mb": 2530},
+    "translator": {"title": "翻译（粤语/英文→普通话，可选）", "size_mb": 1130},
 }
 TRIES_PER_SOURCE = 3
 

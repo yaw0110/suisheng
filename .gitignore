@@ -14,3 +14,4 @@ app/build/
 dist/
 *.app/
 app/icon/preview_*.png
+models-xp/

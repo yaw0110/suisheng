@@ -7,9 +7,14 @@
 [models]
 dir = "models"
 sensevoice = "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17"   # 实时识别（快）
-qwen_asr = "Qwen3-ASR-1.7B-8bit"                                      # 定稿精修（准）
-translator = "Hy-MT2-7B-4bit"                                         # 翻译
+qwen_asr = "Qwen3-ASR-1.7B-GGUF"                                      # 定稿精修（准），llama.cpp 运行
+translator = "Hy-MT2-1.8B-GGUF"                                       # 翻译，llama.cpp 运行（高配可换 Hy-MT2-7B-GGUF）
 audiotee = "vendor/audiotee/.build/release/audiotee"                  # 抓系统声音
+
+[llama]
+server = ""            # llama-server 路径；留空则依次找 <数据目录>/bin、PATH、Homebrew
+gpu_layers = 99        # 放到 GPU 的层数：99=尽量全放（Mac Metal / Win CUDA·Vulkan），0=只用 CPU
+threads = 0            # CPU 线程数，0=自动
 
 [asr]
 threads = 4

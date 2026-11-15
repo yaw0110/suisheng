@@ -50,7 +50,8 @@ class Captioner:
         if text:
             self.bus.dbg(f"  [final   音频 {self.bus.fed/SR:5.1f}s 实际 {self.bus.now():5.1f}s] {text}")
         r = self.refiner
-        if (r.use_qwen and audio is not None and len(audio) > SR * 0.4
+        short_noise = len(audio) < SR * 1.2 and not meaningful(text) if audio is not None else False
+        if (r.use_qwen and audio is not None and len(audio) > SR * 0.4 and not short_noise
                 and _rms(audio) > self.f.min_audio_rms):
             self.sid += 1                                       # 交给 Qwen 精修；先显示 SenseVoice 版本
             r.submit(self.sid, audio.copy(), text if meaningful(text) else "")
