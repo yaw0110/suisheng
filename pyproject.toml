@@ -1,6 +1,6 @@
 [project]
 name = "livecaption"
-version = "0.2.0"
+version = "0.3.0"
 description = "Mac 本地实时字幕：系统音频 → SenseVoice / Qwen3-ASR → Hy-MT2 翻译 → 悬浮字幕"
 requires-python = ">=3.11"
 # 运行依赖的精确版本见 requirements.txt（用 pip install --no-deps -r 安装，避免 mlx-audio 顺带装上 torch 等 1GB+ 用不到的包）
@@ -14,7 +14,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["livecaption"]
+packages = ["livecaption", "livecaption.ui"]
 
 [tool.setuptools.package-data]
-livecaption = ["default_config.toml", "default_hotwords.txt", "model_manifest.json"]
+livecaption = ["default_config.toml", "default_hotwords.txt", "model_manifest.json", "assets/*.png"]

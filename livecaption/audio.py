@@ -1,6 +1,4 @@
-"""音频来源：系统声音（audiotee / Core Audio Tap）或测试用 wav 文件。都产出 0.1 秒一块的 float32 16k 单声道"""
-import atexit
-import subprocess
+"""测试 / 管道用的音频来源（系统声音见 sysaudio.py）：wav 文件或标准输入。都产出 0.1 秒一块的 float32 16k 单声道"""
 import time
 
 import numpy as np
@@ -41,18 +39,3 @@ def stdin_source(stop):
         if len(b) % 2:
             b = b[:-1]
         yield np.frombuffer(b, np.int16).astype(np.float32) / 32768
-
-
-def system_source(tee_path, stop):
-    p = subprocess.Popen([str(tee_path), "--sample-rate", str(SR), "--chunk-duration", "0.1"],
-                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    atexit.register(lambda: p.poll() is None and p.terminate())  # 悬浮窗直接退出进程时也别留下 audiotee
-    try:
-        while not stop.is_set():
-            b = p.stdout.read(CHUNK * 2)
-            if not b:
-                break
-            yield np.frombuffer(b, np.int16).astype(np.float32) / 32768
-    finally:
-        if p.poll() is None:
-            p.terminate()
