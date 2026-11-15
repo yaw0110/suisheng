@@ -7,9 +7,10 @@ import os
 import queue
 import sys
 import threading
+import time
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QTimer, QUrl, Signal
+from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QAction, QActionGroup, QCursor, QDesktopServices, QGuiApplication, QIcon
 from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon
 
@@ -21,7 +22,7 @@ from ..llama import find_server
 from ..runtime import Runtime
 from .models_window import ModelsWindow
 from .overlay import Overlay
-from .platform import hide_dock_icon
+from .panel import Panel
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 DEFAULTS = {"mode": "speech", "lang": "auto", "script": "s", "refine": True, "translate": False}
@@ -64,10 +65,16 @@ class App(QObject):
         self.engine = None
         self.state = "off"               # off / starting / on / stopping
         self.top_id = -1
+        self.last_tray = 0.0
         self.overlay = Overlay(cfg.display)
         self.models_win = ModelsWindow(cfg)
         self.models_win.changed.connect(self._refresh_icon)
         self.started.connect(self._on_started)
+        from .. import __version__
+        self.panel = Panel(self.settings, __version__)
+        self.panel.toggle.connect(self.toggle)
+        self.panel.setting.connect(self._set)
+        self.panel.action.connect(self._on_action)
 
         icon = QIcon()
         if sys.platform == "darwin":
@@ -87,6 +94,7 @@ class App(QObject):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._poll)
         self.timer.start(50)
+        self.panel.bring_up()
         if not models.installed(self.home, "sensevoice"):
             self.models_win.show_first_run()
         elif os.environ.get("LIVECAPTION_AUTOSTART"):            # 测试用：启动后自动开始字幕
@@ -105,6 +113,7 @@ class App(QObject):
 
     # ---------- 托盘 ----------
     def _on_tray(self, reason):
+        self.last_tray = time.time()
         R = QSystemTrayIcon.ActivationReason
         right = (QGuiApplication.mouseButtons() & QtRight()) or (QGuiApplication.keyboardModifiers() & QtCtrl())
         if reason == R.Context or (reason == R.Trigger and sys.platform == "darwin" and right):
@@ -113,7 +122,26 @@ class App(QObject):
         elif reason == R.Trigger:
             self.toggle()
 
+    def _on_action(self, name):
+        if name == "models":
+            self.models_win.show_normal()
+        elif name == "hotwords":
+            self._open(self.home / "hotwords.txt")
+        elif name == "config":
+            self._open(self.home / "config.toml")
+        elif name == "logs":
+            self._open(self.home / "logs" / "latest.txt", self.home / "logs")
+        elif name == "quit":
+            self.quit()
+
+    def show_panel(self):
+        self.panel.bring_up()
+
     def _refresh_icon(self):
+        llama = bool(find_server(self.base_cfg))
+        self.panel.set_state(self.state)
+        self.panel.set_available(llama and models.installed(self.home, "qwen_asr"),
+                                 llama and models.installed(self.home, "translator"))
         tip = {"off": "随声：已关闭（点击开始，右键设置）", "starting": "随声：启动中…",
                "on": "随声：字幕运行中（点击停止，右键设置）", "stopping": "随声：关闭中…"}[self.state]
         self.tray.setToolTip(tip)
@@ -145,6 +173,7 @@ class App(QObject):
             else:
                 m.addAction(f"{title}（未下载，点此下载…）", self.models_win.show_normal)
         m.addSeparator()
+        m.addAction("打开控制面板…", self.show_panel)
         m.addAction("模型管理…", self.models_win.show_normal)
         m.addAction("编辑热词表…", lambda: self._open(self.home / "hotwords.txt"))
         m.addAction("编辑配置（字号、断句等）…", lambda: self._open(self.home / "config.toml"))
@@ -159,7 +188,14 @@ class App(QObject):
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(p)))
 
     def _set(self, key, val):
+        if self.settings[key] == val:
+            return
         self.settings.set(key, val)
+        w = self.panel.combos.get(key) or self.panel.checks.get(key)
+        if w is not None:
+            w.blockSignals(True)
+            w.setCurrentIndex(w.findData(val)) if key in self.panel.combos else w.setChecked(bool(val))
+            w.blockSignals(False)
         if self.state == "on":                                   # 运行中改设置：自动重启字幕
             self.stop(then_start=True)
 
@@ -260,15 +296,28 @@ def run_app(cfg):
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName("随声")
     app.setWindowIcon(QIcon(str(ASSETS / "icon.png")))
-    hide_dock_icon()
+    from PySide6.QtNetwork import QLocalServer, QLocalSocket
+    import hashlib
+    key = "suisheng-" + hashlib.md5(str(cfg.home).encode()).hexdigest()[:12]
+    probe = QLocalSocket(); probe.connectToServer(key)
+    if probe.waitForConnected(300):                              # 已经在运行：让它把面板调出来，自己退出
+        probe.write(b"show"); probe.flush(); probe.waitForBytesWritten(300); probe.disconnectFromServer()
+        return 0
     rt = Runtime(cfg.paths.runtime)
     if not rt.acquire_lock():
-        QMessageBox.information(None, "随声", "随声已经在运行了（看看菜单栏 / 托盘里的羽毛笔图标）。")
+        QMessageBox.information(None, "随声", "随声已经在运行了。")
         return 3
+    QLocalServer.removeServer(key)
+    server = QLocalServer(); server.listen(key)
     if not QSystemTrayIcon.isSystemTrayAvailable():
         QMessageBox.warning(None, "随声", "当前系统没有可用的托盘区域。")
         return 1
-    main_app = App(cfg)                                          # noqa: F841  保持引用
+    main_app = App(cfg)
+    server.newConnection.connect(lambda: (server.nextPendingConnection(), main_app.show_panel()))
+    # 点程序坞图标（macOS）/ 重新激活应用时，调出面板
+    app.applicationStateChanged.connect(
+        lambda st: main_app.show_panel() if st == Qt.ApplicationActive and time.time() - main_app.last_tray > 1.5 and not any(
+            w.isVisible() for w in (main_app.panel, main_app.models_win)) else None)
     return app.exec()
 
 
