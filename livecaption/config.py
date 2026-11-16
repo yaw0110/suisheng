@@ -23,6 +23,16 @@ else:
     APP_HOME = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "livecaption"
 
 
+def utf8_console():
+    """Windows 命令行默认不是 UTF-8（cp1252 / gbk），打印中文会出错：所有命令行入口统一改成 UTF-8"""
+    for stream in (sys.stdout, sys.stderr):
+        if stream is not None and hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                pass
+
+
 def default_home():
     """从源码目录运行用项目根目录；安装版（PyInstaller 打包）用用户数据目录；环境变量 LIVECAPTION_HOME 可覆盖"""
     if os.environ.get("LIVECAPTION_HOME"):

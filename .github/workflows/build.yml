@@ -1,4 +1,4 @@
-# 自动构建：macOS（Apple 芯片）与 Windows 用同一份代码、同一份 PyInstaller 配置分别打包并冒烟测试。
+# 自动构建：macOS 15（Apple 芯片）与 Windows 用同一份代码、同一份 PyInstaller 配置分别打包并冒烟测试。
 # 推送 v* 标签时把两个安装包上传到对应的 Release。
 name: build
 
@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-14, plat: macos }
+          - { os: macos-15, plat: macos }
           - { os: windows-latest, plat: windows }
     runs-on: ${{ matrix.os }}
     env:

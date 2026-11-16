@@ -11,18 +11,8 @@ from .runtime import Runtime, watch_parent
 EXIT_ALREADY_RUNNING = 3
 
 
-def _utf8_console():
-    """Windows 命令行默认不是 UTF-8（如 cp1252 / gbk），打印中文字幕会出错：统一改成 UTF-8"""
-    for stream in (sys.stdout, sys.stderr):
-        if stream is not None and hasattr(stream, "reconfigure"):
-            try:
-                stream.reconfigure(encoding="utf-8", errors="replace")
-            except (ValueError, OSError):
-                pass
-
-
 def main(argv=None):
-    _utf8_console()
+    config.utf8_console()
     cfg = config.load(argv)
     a = cfg.args
     if not a.no_ui:

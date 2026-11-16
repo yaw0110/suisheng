@@ -16,7 +16,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-from .config import default_home, load_raw
+from .config import default_home, load_raw, utf8_console
 
 MARK = ".complete"
 MANIFEST = json.loads((Path(__file__).parent / "model_manifest.json").read_text(encoding="utf-8"))
@@ -157,6 +157,7 @@ def download(home, key, emit=None, cancel=None):
 
 
 def main(argv=None):
+    utf8_console()
     ap = argparse.ArgumentParser(prog="livecaption.models")
     ap.add_argument("cmd", choices=["status", "download"])
     ap.add_argument("key", nargs="?", choices=list(CATALOG))

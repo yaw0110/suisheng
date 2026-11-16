@@ -16,7 +16,7 @@ home = Path(tempfile.mkdtemp(prefix="suisheng-smoke-"))
 ROOT = Path(__file__).resolve().parent.parent
 
 print("== 下载实时识别模型", flush=True)
-rc = subprocess.run([sys.executable, "-I", "-m", "livecaption.models", "download", "sensevoice", "--home", str(home)],
+rc = subprocess.run([sys.executable, "-X", "utf8", "-I", "-m", "livecaption.models", "download", "sensevoice", "--home", str(home)],
                     cwd=ROOT, stdout=subprocess.DEVNULL).returncode
 assert rc == 0, "模型下载失败"
 
