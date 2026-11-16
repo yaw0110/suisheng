@@ -4,6 +4,9 @@
 运行：.venv/bin/python -I tests/regression.py            （约 1 分钟）
 确认新输出是改进后更新基准：.venv/bin/python -I tests/regression.py --update
 """
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    _s.reconfigure(encoding="utf-8", errors="replace")
 import difflib
 import re
 import subprocess

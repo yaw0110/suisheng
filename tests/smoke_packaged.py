@@ -1,6 +1,9 @@
 """打包后冒烟测试（CI 用，macOS / Windows 通用）：
 下载实时识别模型和一段粤语样音 → 用打包好的程序（命令行模式）识别 → 检查输出；再检查包内 llama-server 能运行。
 用法：python -I tests/smoke_packaged.py <打包程序路径> <包内 llama 目录>"""
+import sys as _sys
+for _s in (_sys.stdout, _sys.stderr):
+    _s.reconfigure(encoding="utf-8", errors="replace")
 import os
 import subprocess
 import sys
