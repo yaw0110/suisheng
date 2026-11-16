@@ -116,10 +116,12 @@ def download(home, key, emit=None, cancel=None):
             name = "魔搭" if src["type"] == "modelscope" else src["endpoint"].replace("https://", "")
             _emit(event="source", endpoint=name)
             for attempt in range(1, TRIES_PER_SOURCE + 1):
-                cmd = ["curl", "-fL", "-sS", "-C", "-", "--connect-timeout", "15",
+                cmd = ["curl.exe" if sys.platform == "win32" else "curl", "-fL", "-sS", "-C", "-", "--connect-timeout", "15",
                        "--speed-limit", "1024", "--speed-time", "30",     # 30 秒低于 1KB/s → 判定卡死，断开重试
                        "-o", str(part), *_proxy_args(src), _url(src, path)]
-                p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+                p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+                                     encoding="utf-8", errors="replace",
+                                     creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
                 while p.poll() is None:
                     time.sleep(0.5)
                     if cancel is not None and cancel.is_set():

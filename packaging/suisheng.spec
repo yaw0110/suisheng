@@ -34,7 +34,11 @@ a = Analysis(
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="Suisheng", console=False, upx=False,
           icon=str(ROOT / ("app/icon/AppIcon.icns" if MAC else "packaging/AppIcon.ico")))
-coll = COLLECT(exe, a.binaries, a.datas, name="Suisheng", upx=False)
+extra = []
+if WIN:   # Windows 另带一个控制台版：命令行测试 / 排查问题用（suisheng-cli.exe --file x.wav --no-ui）
+    extra.append(EXE(pyz, a.scripts, [], exclude_binaries=True, name="suisheng-cli", console=True, upx=False,
+                     icon=str(ROOT / "packaging/AppIcon.ico")))
+coll = COLLECT(exe, *extra, a.binaries, a.datas, name="Suisheng", upx=False)
 if MAC:
     app = BUNDLE(
         coll, name="随声.app", icon=str(ROOT / "app/icon/AppIcon.icns"), bundle_identifier="com.livecaption.app",

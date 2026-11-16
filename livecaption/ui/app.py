@@ -302,7 +302,17 @@ def QtCtrl():
     return Qt.ControlModifier
 
 
+def _redirect_output(home):
+    """打包后的 Windows 窗口程序没有控制台：把输出与报错写进日志文件，便于排查"""
+    if sys.stdout is None or sys.stderr is None:
+        log = open(Path(home) / "logs" / "app.log", "a", encoding="utf-8", buffering=1)
+        sys.stdout = sys.stdout or log
+        sys.stderr = sys.stderr or log
+
+
 def run_app(cfg):
+    (cfg.home / "logs").mkdir(parents=True, exist_ok=True)
+    _redirect_output(cfg.home)
     app = QApplication(sys.argv[:1])
     app.setQuitOnLastWindowClosed(False)
     app.setApplicationName("随声")

@@ -1,0 +1,79 @@
+# 自动构建：macOS（Apple 芯片）与 Windows 用同一份代码、同一份 PyInstaller 配置分别打包并冒烟测试。
+# 推送 v* 标签时把两个安装包上传到对应的 Release。
+name: build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-14, plat: macos }
+          - { os: windows-latest, plat: windows }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller==6.22.3
+          python -m pip install --no-deps -e .
+      - name: 单元测试
+        run: python -I tests/test_segmenter.py
+
+      - name: 打包（macOS）
+        if: matrix.plat == 'macos'
+        run: PYTHON=python packaging/build_mac.sh --no-test
+      - name: 冒烟测试（macOS）
+        if: matrix.plat == 'macos'
+        run: python -I tests/smoke_packaged.py "dist/随声.app/Contents/MacOS/Suisheng" "dist/随声.app/Contents/Resources/llama"
+
+      - name: 打包（Windows）
+        if: matrix.plat == 'windows'
+        shell: pwsh
+        run: ./packaging/build_win.ps1
+      - name: 冒烟测试（Windows）
+        if: matrix.plat == 'windows'
+        run: python -I tests/smoke_packaged.py "dist/Suisheng/suisheng-cli.exe" "dist/Suisheng/llama"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: suisheng-${{ matrix.plat }}
+          path: |
+            dist/*.dmg
+            dist/*-setup.exe
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: 上传到 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la artifacts
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "随声 ${GITHUB_REF_NAME#v}" --notes "安装包见下方附件。"
+          gh release upload "$GITHUB_REF_NAME" artifacts/* --repo "$GITHUB_REPOSITORY" --clobber
