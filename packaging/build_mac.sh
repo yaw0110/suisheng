@@ -13,7 +13,7 @@ step "1/5 PyInstaller"
 rm -rf build/pyi dist
 "$PY" -m PyInstaller --noconfirm --clean --log-level WARN --distpath dist --workpath build/pyi packaging/suisheng.spec
 
-step "2/5 放入 llama.cpp（$LLAMA_BUILD，只取 llama-server 及其依赖库）"
+step "2/5 放入 llama.cpp（${LLAMA_BUILD}，只取 llama-server 及其依赖库）"
 mkdir -p "$CACHE/llama"; T="$CACHE/llama/llama-$LLAMA_BUILD-bin-macos-arm64.tar.gz"
 [ -f "$T" ] || curl -fSL --retry 3 ${HTTPS_PROXY:+--proxy "$HTTPS_PROXY"} -o "$T" \
    "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_BUILD/llama-$LLAMA_BUILD-bin-macos-arm64.tar.gz"
@@ -40,4 +40,4 @@ step "5/5 DMG"
 S=$(mktemp -d); cp -R "$APP" "$S/"; ln -s /Applications "$S/Applications"; cp packaging/INSTALL.txt "$S/"
 DMG="dist/Suisheng-$VER-macos-arm64.dmg"
 hdiutil create -quiet -volname "Suisheng $VER" -srcfolder "$S" -ov -format UDZO "$DMG"; rm -rf "$S"
-echo; echo "完成：$DMG（$(du -h "$DMG" | cut -f1)），App $(du -sh "$APP" | cut -f1)"
+echo; echo "完成：${DMG}（$(du -h "$DMG" | cut -f1)），App $(du -sh "$APP" | cut -f1)"
