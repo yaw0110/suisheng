@@ -1,4 +1,4 @@
-"""随声 · 主程序（托盘 / 菜单栏图标 + 悬浮字幕 + 模型管理），macOS / Windows 同一份代码。
+"""Suisheng · 主程序（托盘 / 菜单栏图标 + 悬浮字幕 + 模型管理），macOS / Windows 同一份代码。
 
 左键点托盘图标：开始 / 停止字幕；右键（Mac 也可按住 Control 点）：设置菜单。
 字幕引擎（识别、精修、翻译）在本进程的后台线程里运行。"""
@@ -27,7 +27,7 @@ from .platform import set_overlay_mode
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 DEFAULTS = {"mode": "speech", "lang": "auto", "script": "s", "refine": True, "translate": False, "overlay_pos": None}
-CONFIG_TEMPLATE = """# 随声 · 自定义配置：只写要修改的项，其余沿用默认值。改完重新开启字幕生效。
+CONFIG_TEMPLATE = """# Suisheng · 自定义配置：只写要修改的项，其余沿用默认值。改完重新开启字幕生效。
 # 全部可调项及说明见程序内置的 default_config.toml，例如：
 # [display]
 # font = 32            # 字号
@@ -148,8 +148,8 @@ class App(QObject):
         self.panel.set_state(self.state)
         self.panel.set_available(llama and models.installed(self.home, "qwen_asr"),
                                  llama and models.installed(self.home, "translator"))
-        tip = {"off": "随声：已关闭（点击开始，右键设置）", "starting": "随声：启动中…",
-               "on": "随声：字幕运行中（点击停止，右键设置）", "stopping": "随声：关闭中…"}[self.state]
+        tip = {"off": "Suisheng：已关闭（点击开始，右键设置）", "starting": "Suisheng：启动中…",
+               "on": "Suisheng：字幕运行中（点击停止，右键设置）", "stopping": "Suisheng：关闭中…"}[self.state]
         self.tray.setToolTip(tip)
 
     def _build_menu(self):
@@ -186,7 +186,7 @@ class App(QObject):
         m.addAction("查看字幕记录", lambda: self._open(self.home / "logs" / "latest.txt", self.home / "logs"))
         m.addSeparator()
         from .. import __version__
-        about = m.addAction(f"随声 {__version__}"); about.setEnabled(False)
+        about = m.addAction(f"Suisheng {__version__}"); about.setEnabled(False)
         m.addAction("退出", self.quit)
 
     def _open(self, path, fallback=None):
@@ -233,7 +233,7 @@ class App(QObject):
     def _on_started(self, result):
         if isinstance(result, Exception):
             self.state = "off"; self.overlay.hide(); self._refresh_icon(); set_overlay_mode(False)
-            QMessageBox.warning(None, "随声", f"字幕启动失败：{result}\n\n如果是 macOS，请到「系统设置 → 隐私与安全性 → "
+            QMessageBox.warning(None, "Suisheng", f"字幕启动失败：{result}\n\n如果是 macOS，请到「系统设置 → 隐私与安全性 → "
                                               "屏幕与系统录音」允许本程序录制系统声音。")
             return
         self.engine, self.state, self.top_id = result, "on", -1
@@ -302,10 +302,20 @@ def QtCtrl():
     return Qt.ControlModifier
 
 
+def _redirect_output(home):
+    """打包后的 Windows 窗口程序没有控制台：把输出与报错写进日志文件，便于排查"""
+    if sys.stdout is None or sys.stderr is None:
+        log = open(Path(home) / "logs" / "app.log", "a", encoding="utf-8", buffering=1)
+        sys.stdout = sys.stdout or log
+        sys.stderr = sys.stderr or log
+
+
 def run_app(cfg):
+    (cfg.home / "logs").mkdir(parents=True, exist_ok=True)
+    _redirect_output(cfg.home)
     app = QApplication(sys.argv[:1])
     app.setQuitOnLastWindowClosed(False)
-    app.setApplicationName("随声")
+    app.setApplicationName("Suisheng")
     app.setWindowIcon(QIcon(str(ASSETS / "icon.png")))
     from PySide6.QtNetwork import QLocalServer, QLocalSocket
     import hashlib
@@ -316,12 +326,12 @@ def run_app(cfg):
         return 0
     rt = Runtime(cfg.paths.runtime)
     if not rt.acquire_lock():
-        QMessageBox.information(None, "随声", "随声已经在运行了。")
+        QMessageBox.information(None, "Suisheng", "Suisheng 已经在运行了。")
         return 3
     QLocalServer.removeServer(key)
     server = QLocalServer(); server.listen(key)
     if not QSystemTrayIcon.isSystemTrayAvailable():
-        QMessageBox.warning(None, "随声", "当前系统没有可用的托盘区域。")
+        QMessageBox.warning(None, "Suisheng", "当前系统没有可用的托盘区域。")
         return 1
     main_app = App(cfg)
     server.newConnection.connect(lambda: (server.nextPendingConnection(), main_app.show_panel()))

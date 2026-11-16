@@ -1,6 +1,6 @@
-<p align="center"><img src="app/icon/icon_1024.png" width="128" alt="随声"></p>
+<p align="center"><img src="app/icon/icon_1024.png" width="128" alt="Suisheng"></p>
 
-# 随声
+# Suisheng
 
 **本地实时字幕（macOS / Windows）**：抓取电脑正在播放的声音（视频、剧集、直播、播客、歌曲），实时生成**英文 / 普通话 / 粤语**字幕，可选把粤语、英文**翻译成普通话**。识别和翻译全部在本机完成，声音和文字不会上传。
 
@@ -15,16 +15,16 @@
 
 从 [Releases](https://github.com/yaw0110/suisheng/releases) 下载对应系统的安装包。
 
-**macOS**（Apple 芯片，macOS 14.2+）：打开 `Suisheng-<版本>-macos-arm64.dmg`，把「随声」拖进「应用程序」。首次打开若提示“无法验证开发者”，到「系统设置 → 隐私与安全性」点“仍要打开”（免费签名，只需一次）。第一次开始字幕时允许“录制系统声音”。详见 [安装说明](packaging/安装说明.txt)。
+**macOS**（Apple 芯片，macOS 14.2+）：打开 `Suisheng-<版本>-macos-arm64.dmg`，把「Suisheng」拖进「应用程序」。首次打开若提示“无法验证开发者”，到「系统设置 → 隐私与安全性」点“仍要打开”（免费签名，只需一次）。第一次开始字幕时允许“录制系统声音”。详见 [INSTALL](packaging/INSTALL.txt)。
 
-**Windows**（10 / 11，x64）：安装程序制作中。
+**Windows**（10 / 11，x64，**测试版**）：运行 `Suisheng-<版本>-windows-x64-setup.exe`，装到当前用户目录（无需管理员）。若出现 SmartScreen“Windows 已保护你的电脑”，点「更多信息 → 仍要运行」（未购买代码签名证书，只需一次）。Windows 版已通过云端自动构建与测试，真机体验仍在验证中，欢迎反馈问题。
 
 首次打开会自动下载「实时识别」模型（约 240MB，默认国内魔搭镜像）；Qwen 精修（2.5GB）、翻译（1.1GB）可在「模型管理」里按需下载。
 
 ## 工作原理
 
 ```
-随声（一个进程，Python）
+Suisheng（一个进程，Python）
 ├─ ui/          PySide6：控制面板 · 托盘 · 悬浮字幕 · 模型管理（全平台一套代码）
 ├─ sysaudio.py  抓系统声音 → 16k 单声道（macOS：Core Audio Tap / catap；Windows：WASAPI 回环 / PyAudioWPatch）
 ├─ captioner.py [识别线程] SenseVoice（sherpa-onnx）每 ~0.3 秒对未定稿音频重识别 → 按字间停顿断句
@@ -64,7 +64,7 @@ packaging/build_mac.sh                                                # 打包 m
 |---|---|
 | `livecaption/` | Python 包；`default_config.toml` 默认配置（用户在数据目录的 `config.toml` 里只写要改的项）；`model_manifest.json` 模型清单与校验和 |
 | `livecaption/ui/` | 界面：`app.py` 主程序、`panel.py` 控制面板、`overlay.py` 悬浮字幕、`models_window.py` 模型管理 |
-| `packaging/` | `suisheng.spec`（PyInstaller，全平台共用）、`build_mac.sh`、`entry.py`、安装说明 |
+| `packaging/` | `suisheng.spec`（PyInstaller，全平台共用）、`build_mac.sh`、`entry.py`、INSTALL |
 | `app/icon/` | 图标源文件（`make_icon.swift` 生成） |
 | `tests/` `tools/` | 测试；引擎对比 / 测速脚本 |
 

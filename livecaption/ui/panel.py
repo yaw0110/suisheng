@@ -18,7 +18,7 @@ class Panel(QWidget):
 
     def __init__(self, settings, version):
         super().__init__(None, Qt.Window)
-        self.setWindowTitle("随声")
+        self.setWindowTitle("Suisheng")
         self.setMinimumWidth(360)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(22, 18, 22, 18)
@@ -58,11 +58,11 @@ class Panel(QWidget):
             b = QPushButton(text); b.clicked.connect(lambda _=False, k=key: self.action.emit(k)); row.addWidget(b)
         lay.addLayout(row)
         foot = QHBoxLayout()
-        ver = QLabel(f"随声 {version}"); ver.setStyleSheet("color: gray;")
-        quit_btn = QPushButton("退出随声"); quit_btn.clicked.connect(lambda: self.action.emit("quit"))
+        ver = QLabel(f"Suisheng {version}"); ver.setStyleSheet("color: gray;")
+        quit_btn = QPushButton("退出 Suisheng"); quit_btn.clicked.connect(lambda: self.action.emit("quit"))
         foot.addWidget(ver); foot.addStretch(1); foot.addWidget(quit_btn)
         lay.addLayout(foot)
-        tip = QLabel("关掉这个窗口字幕照常运行。要再打开它：再次打开「随声」，或点菜单栏 / 托盘的羽毛笔"
+        tip = QLabel("关掉这个窗口字幕照常运行。要再打开它：再次打开「Suisheng」，或点菜单栏 / 托盘的羽毛笔"
                      + ("；字幕运行时程序坞图标会暂时隐藏（这样字幕才能盖住全屏视频）。" if sys.platform == "darwin" else "。"))
         tip.setWordWrap(True); tip.setStyleSheet("color: gray; font-size: 11px;")
         lay.addWidget(tip)

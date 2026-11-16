@@ -38,7 +38,7 @@ def _install_mac_copy(src, home):
     """macOS：首次运行时把 App 内置的 llama.cpp 复制到用户数据目录，之后从那里启动。
     实测（macOS 15）：用户对 App 点过“仍要打开”后，由它写出的文件虽仍带来源标记，但已随 App 一并放行，可正常运行；
     同时用户数据目录可写，避免依赖 App 包内路径（App 被系统临时搬到只读位置运行时也不受影响）。"""
-    version = (src / "VERSION").read_text().strip() if (src / "VERSION").exists() else "llama"
+    version = (src / "VERSION").read_text(encoding="utf-8").strip() if (src / "VERSION").exists() else "llama"
     dst = Path(home) / "bin" / version
     if (dst / EXE).is_file() and (dst / ".ok").exists():
         return dst
@@ -48,7 +48,7 @@ def _install_mac_copy(src, home):
         if f.is_file():
             shutil.copyfile(f, tmp / f.name)                       # copyfile：不复制扩展属性
             os.chmod(tmp / f.name, 0o755 if (f.name == EXE or f.suffix == ".dylib") else 0o644)
-    (tmp / ".ok").write_text(version)
+    (tmp / ".ok").write_text(version, encoding="utf-8")
     shutil.rmtree(dst, ignore_errors=True); tmp.rename(dst)
     return dst
 
@@ -102,15 +102,24 @@ class LlamaServer:
 
     # ---- 生命周期 ----
     def _kill_stale(self):
-        """上次异常退出留下的同名 llama-server：按 pid 文件清掉"""
+        """上次异常退出留下的同名 llama-server：按 pid 文件清掉（先确认那个进程确实是 llama-server，防止误杀）"""
         if not self.run_dir:
             return
+        from .runtime import pid_alive, pid_name
         pf = self.run_dir / f"{self.name}.pid"
         try:
-            pid = int(pf.read_text())
-            os.kill(pid, 15)
+            pid = int(pf.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            pass
+            return
+        if pid_alive(pid) and pid_name(pid).lower().startswith("llama-server"):
+            try:
+                if os.name == "nt":
+                    subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+                else:
+                    os.kill(pid, 15)
+            except OSError:
+                pass
 
     def start(self, timeout=180):
         self._kill_stale()
@@ -125,12 +134,12 @@ class LlamaServer:
         log = subprocess.DEVNULL
         if self.log_dir:
             self.log_dir.mkdir(parents=True, exist_ok=True)
-            log = open(self.log_dir / f"{self.name}.log", "w")
+            log = open(self.log_dir / f"{self.name}.log", "w", encoding="utf-8")
         flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         self.proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=log, stderr=log, creationflags=flags)
         if self.run_dir:
             self.run_dir.mkdir(parents=True, exist_ok=True)
-            (self.run_dir / f"{self.name}.pid").write_text(str(self.proc.pid))
+            (self.run_dir / f"{self.name}.pid").write_text(str(self.proc.pid), encoding="utf-8")
         atexit.register(self.stop)
         t0 = time.time()
         while time.time() - t0 < timeout:

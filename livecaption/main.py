@@ -12,6 +12,7 @@ EXIT_ALREADY_RUNNING = 3
 
 
 def main(argv=None):
+    config.utf8_console()
     cfg = config.load(argv)
     a = cfg.args
     if not a.no_ui:
