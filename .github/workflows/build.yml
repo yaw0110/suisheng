@@ -42,7 +42,7 @@ jobs:
         run: PYTHON=python packaging/build_mac.sh --no-test
       - name: 冒烟测试（macOS）
         if: matrix.plat == 'macos'
-        run: python -I tests/smoke_packaged.py "dist/随声.app/Contents/MacOS/Suisheng" "dist/随声.app/Contents/Resources/llama"
+        run: python -I tests/smoke_packaged.py "dist/Suisheng.app/Contents/MacOS/Suisheng" "dist/Suisheng.app/Contents/Resources/llama"
 
       - name: 打包（Windows）
         if: matrix.plat == 'windows'
@@ -75,5 +75,5 @@ jobs:
         run: |
           ls -la artifacts
           gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "随声 ${GITHUB_REF_NAME#v}" --notes "安装包见下方附件。"
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Suisheng ${GITHUB_REF_NAME#v}" --notes "安装包见下方附件。"
           gh release upload "$GITHUB_REF_NAME" artifacts/* --repo "$GITHUB_REPOSITORY" --clobber

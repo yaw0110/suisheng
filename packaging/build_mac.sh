@@ -6,7 +6,7 @@ PY="${PYTHON:-$ROOT/.venv-build/bin/python}"
 LLAMA_BUILD="b12359"
 CACHE="$HOME/Library/Caches/livecaption-build"
 VER=$("$PY" -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
-APP="dist/随声.app"
+APP="dist/Suisheng.app"
 step() { echo; echo "==> $*"; }
 
 step "1/5 PyInstaller"
@@ -37,7 +37,7 @@ if [ "${1:-}" != "--no-test" ] && [ -f data/samples/yue.wav ]; then
 fi
 
 step "5/5 DMG"
-S=$(mktemp -d); cp -R "$APP" "$S/"; ln -s /Applications "$S/Applications"; cp packaging/安装说明.txt "$S/"
+S=$(mktemp -d); cp -R "$APP" "$S/"; ln -s /Applications "$S/Applications"; cp packaging/INSTALL.txt "$S/"
 DMG="dist/Suisheng-$VER-macos-arm64.dmg"
-hdiutil create -quiet -volname "随声 $VER" -srcfolder "$S" -ov -format UDZO "$DMG"; rm -rf "$S"
+hdiutil create -quiet -volname "Suisheng $VER" -srcfolder "$S" -ov -format UDZO "$DMG"; rm -rf "$S"
 echo; echo "完成：$DMG（$(du -h "$DMG" | cut -f1)），App $(du -sh "$APP" | cut -f1)"

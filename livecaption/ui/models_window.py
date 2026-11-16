@@ -19,7 +19,7 @@ class ModelsWindow(QWidget):
     def __init__(self, cfg):
         super().__init__(None, Qt.Window)
         self.cfg, self.home = cfg, cfg.home
-        self.setWindowTitle("随声 · 模型管理")
+        self.setWindowTitle("Suisheng · 模型管理")
         self.bridge = _Bridge()
         self.bridge.event.connect(self._on_event)
         self.bridge.finished.connect(self._on_finished)
@@ -62,7 +62,7 @@ class ModelsWindow(QWidget):
         self.llama_note.setText("" if has_llama else "⚠️ 没找到推理组件 llama.cpp（llama-server）：精修和翻译暂不可用。")
 
     def show_first_run(self):
-        self.head.setText("欢迎使用随声！正在自动下载必需的「实时识别」模型（约 240MB，国内镜像，约 1 分钟）。\n"
+        self.head.setText("欢迎使用 Suisheng！正在自动下载必需的「实时识别」模型（约 240MB，国内镜像，约 1 分钟）。\n"
                           "可选：Qwen 精修让粤语更准（建议 16GB 内存）；翻译把粤语 / 英文译成普通话。")
         self.auto = [k for k in ("sensevoice",) if not self.installed(k)]
         self._open()
